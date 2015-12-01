@@ -1,0 +1,37 @@
+<div class="slidebox-container">
+    <div class="slidebox">
+        <div class="slidebox-content">
+            <div ng-repeat="post in entries" class="slidebox-item" ng-class="{ 'active' : hover || post.show }" ng-mouseover="hover = true; showPopup(post)" ng-mouseleave="hover = false; hidePopup(post)">
+                <!-- <div class="hidden-xs">
+                    <div class="info-window-image hidden-xs" ng-style="{'background-image':'url('+post.thumbnail_sm+')'}">
+                        <div class="image-overlay">
+                            <div class="image-overlay-view white" ng-show="hover">
+                                <a href="javascript: void(0)" ng-click="showPopup(post)" class="white">Quick View</a><br />
+                                or<br />
+                                <a ui-sref="post({postID:post.id})" class="white">Open Post</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-window-text">
+                        <img class="info-window-icon" ng-src="{{post.icon}}" /> {{post.title}}
+                    </div>
+                </div> -->
+                <!-- <a ui-sref="post({postID:post.id})" class="hidden-sm hidden-md hidden-lg"> -->
+                <a ui-sref="post({postID:post.id})">
+                    <div class="info-window-image" ng-style="{'background-image':'url('+post.thumbnail_sm+')'}">
+                        <div class="image-overlay">
+                            <div class="image-overlay-view white" ng-show="hover">
+                                View Post
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-window-text">
+                        <img class="info-window-icon" ng-src="{{post.icon}}" /> {{post.title}}
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div id="slidebox-control-left" class="slidebox-controls slidebox-left"></div>
+    <div id="slidebox-control-right" class="slidebox-controls slidebox-right"></div>
+</div>

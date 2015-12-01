@@ -1,0 +1,7 @@
+<div ng-controller="ClusterInfoController" class="cluster-info-window">
+	<strong class="black">Posts at this location:</strong>
+
+	<div ng-repeat="point in parameter">
+		&#8226; <a ui-sref="post({postID:point.id})" title="{{point.title}}">{{point.title | addEllipsis:30}}</a>
+	</div>
+</div>

@@ -1,0 +1,598 @@
+<div class="position-relative" ng-show="actions.postReady">
+
+	<div id="tags_selection_slidedown" ng-controller="PostTagsController" class="slidedown-modal" ng-show="actions.showTagsSelection">
+
+		<div class="container" ng-show="actions.showTagsSelection" scroll-dropdown-modal window-height="windowHeight" check-scroll-height="actions.showTagsSelection">
+
+			<a href="javascript: void(0)" ng-click="actions.showTagsSelection = false" class="close"><i class="fa fa-times"></i></a>
+			<div class="clearfix"> </div>
+
+			<h1 class="white">Select Tags for Post</h1>
+
+			<div class="row">
+				<div ng-repeat="item in selectPostTags" class="tag-category-name" ng-class="{ 'active' : actions.postTagCategoryDisplayed == item.category }" ng-click="actions.postTagCategoryDisplayed = item.category">
+					{{item.category}} &nbsp;<i class="fa fa-caret-down"></i>
+				</div>
+			</div>
+
+			<div ng-show="actions.postTagCategoryDisplayed == item.category" class="row tag-row" ng-repeat="item in selectPostTags">
+				<div ng-repeat="tag in item.tags" class="tags-tag" ng-init="tag.postHasTag = false" ng-click="selectTag(item.category, tag, post)" ng-class="{ 'selected' : tag.postHasTag }">
+					{{tag.name}}
+				</div>
+			</div>
+
+			<br /><br />
+
+			<div class="row">
+				<div class="col-xs-4">
+					<a class="white" href="javascript: void(0)" ng-click="actions.showingSuggestTagForm = true">Don't see the tag you're looking for?</a> <span ng-show="actions.showingSuggestTagForm">Submit a recommendation here. Your tag will be submitted for review by an administrator.</span>
+				</div>
+				<div class="col-xs-3">
+					<span ng-show="actions.showingSuggestTagForm">
+						Category Name: 
+						<select class="form-control" ng-options="item.category for item in selectPostTags" ng-model="selectedSuggestCategory" ng-change="actions.postTagCategoryDisplayed = selectedSuggestCategory.category"></select>
+					</span>
+				</div>
+				<div class="col-xs-3">
+					<span ng-show="actions.showingSuggestTagForm">
+						New Tag Name:
+						<input class="form-control" type="text" ng-model="suggestTagValue" />
+					</span>
+				</div>
+				<div class="col-xs-2">
+					<span ng-show="actions.showingSuggestTagForm">
+						<br />
+						<a class="btn btn-default" ng-click="suggestTag(post)">Suggest</a>
+					</span>
+				</div>
+			</div>
+
+			<a class="white" href="javascript: void(0)">
+				<h1 class="white pull-right" ng-click="actions.showTagsSelection = false">
+					Save Tags <i class="fa fa-chevron-circle-right"></i>
+				</h1>
+			</a>
+		</div>
+
+	</div>
+
+	<div ng-if="post.nonexistant">
+		<div class="pull-right">
+			<a ui-sref="main" class="close">
+				<i class="fa fa-times"></i>
+			</a>
+		</div>
+		This post has been deleted or is in review.<br /><br />
+		Return to <a ui-sref="main">search</a>.
+	</div>
+
+	<div class="center" ng-if="post.approved == 0 && post.deleted_at == null && post.id != -1">
+		<h3 class="red">This post is pending Administrator approval.</h3>
+	</div>
+
+	<div ng-if="!post.nonexistant && ((post.approved == 1 && post.deleted_at == null) || (current_user && (post.user_id == current_user.id || current_user.is_moderator)))">
+		<div class="pull-right">
+			<a ui-sref="main" class="close">
+				<i class="fa fa-times"></i>
+			</a>
+		</div>
+
+		<div class="clearfix"> </div>
+
+		<div class="post-media-modal" ng-show="actions.showMediaModal" ng-init="actions.showMediaModal = false">
+
+			<a href="javascript: void(0)" ng-click="actions.showMediaModal = false" class="close"><i class="fa fa-times"></i></a>
+
+			<div ng-if="post.primary_media_type == 'image'">
+				<img ng-if="post.primary_media != ''" ng-src="{{ENV.baseUrl}}uploads/{{post.primary_media}}" />
+			</div>
+
+			<div ng-if="post.primary_media_type == 'video'">
+				<!-- <object data="{{post.primary_media}}" type="application/x-shockwave-flash"><param name="src" value="{{post.primary_media}}" /></object> -->
+				<!-- <iframe ng-if="post.video_host == 'youtube'" src="http://www.youtube.com/embed/{{post.video_id}}"></iframe> -->
+			</div>
+		</div>
+
+		<div class="post-media-modal" ng-show="actions.showLargeMap" ng-init="actions.showLargeMap = false" resize-map map-ready="actions.showLargeMap" map-page="'post'" window-height="windowHeight" window-width="windowWidth">
+
+			<a href="javascript: void(0)" ng-click="closeLargeMap()" class="close"><i class="fa fa-times"></i></a>
+
+			<ui-gmap-google-map center='large_post_map.center' zoom='large_post_map.zoom' options='large_post_map.options' control="large_post_map.control">
+				<ui-gmap-marker coords="post.coords" idkey="post.id" icon="post.icon">
+		        </ui-gmap-marker>
+			</ui-gmap-google-map>
+		</div>
+
+		<div class="duplicate-warning-modal modal" ng-show="actions.duplicateWarning">
+			<div class="modal-dialog">
+		        <div class="modal-content">
+		        	<div class="modal-header">
+			            <a href="javascript: void(0)" ng-click="actions.duplicateWarning = false" class="close"><i class="fa fa-times"></i></a>
+
+			            <h4 class="modal-title" id="myModalLabel">There may already be a post with this title...</h4>
+			        </div>
+
+			        <div class="modal-body">
+			            <a href="{{ENV.baseUrl+'#!/post/'+duplicate.id}}" target="_blank" class="black row-fluid" ng-repeat="duplicate in post.duplicates">
+							<div class="col-xs-4 info-window-image" style="max-width: 50px; max-height: 50px;" ng-style="{'background-image':'url({{ENV.baseUrl}}uploads/{{duplicate.thumbnail}})'}"></div>
+							<div class="col-xs-8" title="{{duplicate.title}}">{{duplicate.title | addEllipsis:35}}<br />{{duplicate.city}}, {{duplicate.state}}</div>
+							<div class="col-xs-2"><img class="info-window-icon" ng-src="{{ENV.baseUrl}}assets/images/icons/{{duplicate.post_type.icon_file}}.png" /></div>
+							<div class="clearfix"></div><br />
+						</a>
+			        </div>
+
+			        <div class="modal-footer">
+				        Are you sure you want to continue?&nbsp;&nbsp;&nbsp;
+				        <button ng-click="actions.ignoreDuplicates = true; actions.duplicateWarning = false;" class="btn btn-primary">Yes</button>
+				        <a ui-sref="main" class="btn btn-default">No (discard post)</a>
+			        </div>
+			    </div>
+			</div>
+		</div>
+
+		<div class="container">
+
+			<div class="row">
+				<div class="col-sm-7 post-column-wrapper">
+
+					<div class="post-column-1">
+						<div class="post-thumb text-center" ng-if="actions.postMode == 'view'">
+							<a href="javascript: void(0)" ng-if="post.primary_media_type == 'image'" ng-click="actions.showMediaModal = true && post.primary_media != ''">
+								<div class="post-thumb-container image">
+									<img ng-src="{{ENV.baseUrl}}uploads/{{post.thumbnail}}" ng-if="post.thumbnail != ''" />
+									<img ng-src="{{ENV.baseUrl}}assets/images/default_image.jpg" ng-if="post.thumbnail == ''" />
+								</div>
+							</a>
+							<!-- <a ng-if="post.primary_media_type == 'video'" href="javascript: void(0)" ng-click="actions.showMediaModal = true"> -->
+							<a ng-if="post.primary_media_type == 'video'" href="{{post.primary_media}}" target="_blank">
+								<div class="post-thumb-container video">
+									<span class="helper"></span>
+									<img ng-src="{{ENV.baseUrl}}uploads/{{post.thumbnail}}" ng-if="post.thumbnail != ''" />
+									<img ng-src="{{ENV.baseUrl}}assets/images/default_image.jpg" ng-if="post.thumbnail == ''" />
+								</div>
+							</a>
+							<a ng-if="post.primary_media_type == 'document'" href="{{post.primary_media}}" target="_blank">
+								<div class="post-thumb-container document">
+									<span class="helper"></span>
+									<img ng-src="{{ENV.baseUrl}}uploads/{{post.thumbnail}}" ng-if="post.thumbnail != ''" />
+									<img ng-src="{{ENV.baseUrl}}assets/images/default_image.jpg" ng-if="post.thumbnail == ''" />
+								</div>
+							</a>
+						</div>
+
+						<div class="post-thumb post-thumb-edit text-center" ng-if="actions.postMode == 'add' || actions.postMode == 'edit'" ng-style="{'background-image':'url('+ENV.baseUrl+'uploads/'+post.thumbnail+')'}">
+							<div class="image-overlay">
+								<h2 class="white">Primary Media</h2>
+
+								<br /><br />
+
+								<strong class="white cap-letters">Media Type</strong>
+								<select ng-model="post.primary_media_type" class="form-control post-upload-control" ng-change="post.primary_media = '';">
+									<option value="">Select Media Type...</option>
+									<option value="image">Image</option>
+									<option value="image-link">Image (Upload from a link)</option>
+									<option value="video">Video</option>
+									<option value="document">Document</option>
+								</select>
+
+								<br /><br />
+
+								<div ng-if="post.primary_media_type == 'image'">
+									<strong class="white cap-letters">Upload Image</strong>
+									<input type="file" accept="image/*" class="form-control post-upload-control" ng-file-select ng-file-change="onFileSelect($files, $event, 'primary_media')">
+								</div>
+
+								<div ng-if="post.primary_media_type == 'image-link'">
+									<strong class="white cap-letters">Upload from a Link</strong>
+									<input type="text" ng-model="post.primary_media_image_from_link" placeholder="Image url..." class="form-control post-upload-control" ng-change="getImageFromLink(post, post.primary_media_image_from_link, 'primary_media')" />
+									<span class="white">This must be an actual image, not a link to a webpage with an image.</span>
+								</div>
+
+								<div ng-if="post.primary_media_type == 'video'">
+									<strong class="white cap-letters">Link Video</strong>
+									<input type="text" ng-model="post.primary_media" placeholder="Link video..." class="form-control post-upload-control" ng-change="validateVideo(post, 'primary_media')" />
+								</div>
+
+								<div ng-if="post.primary_media_type == 'document'">
+									<strong class="white cap-letters">Link Document</strong>
+									<input type="text" ng-model="post.primary_media" placeholder="Link document..." class="form-control post-upload-control" ng-change="validateDocument(post, 'primary_media')" />
+
+									<strong class="white cap-letters">Upload Thumbnail</strong>
+									<input type="file" accept="image/*" class="form-control post-upload-control" ng-file-select ng-file-change="onFileSelect($files, $event, 'primary_media_doc_thumb')">
+								</div>
+							</div>
+
+						</div>
+
+						<div class="post-supplementary-media-header" ng-if="actions.postMode == 'edit' || actions.postMode == 'add' || (post.media_2 != null && post.media_2_type != null) || (post.media_3 != null && post.media_3_type != null)">
+							Supporting Media
+
+							<div class="pull-right cursor-pointer" ng-if="(actions.postMode == 'add' || actions.postMode == 'edit') && (post.media_2 == null || post.media_3 == null)" ng-click="addSupplementaryMedia(post)">
+								<i class="fa fa-plus"></i> Add New
+							</div>
+						</div>
+
+						<div class="post-supplementary-media" ng-if="(post.media_2 != null && post.media_2_type != null) || post.media_2_editing">
+							<div ng-if="post.media_2_editing != true">
+								<strong class="red cap-letters">
+									<a ng-if="post.media_2_type == 'image'" ng-href="{{ENV.baseUrl}}uploads/{{post.media_2}}" target="_blank">{{post.media_2_type}}</a>
+									<a ng-if="post.media_2_type != 'image'" href="{{post.media_2}}" target="_blank">{{post.media_2_type}}</a>
+								</strong> &nbsp; {{post.title}}
+
+								<div class="pull-right post-supplementary-action" ng-if="actions.postMode == 'add' || actions.postMode == 'edit'" ng-click="deleteSupplementaryMedia(post, 2)">
+									<i class="fa fa-trash-o"></i>
+								</div>
+
+								<div class="pull-right post-supplementary-action" ng-if="actions.postMode == 'add' || actions.postMode == 'edit'" ng-click="post.media_2_editing = true">
+									<i class="fa fa-pencil"></i>
+								</div>
+							</div>
+
+							<div ng-if="post.media_2_editing == true">
+								<div class="pull-right post-supplementary-action" ng-click="post.media_2_editing = false">
+									<i class="fa fa-check"></i>
+								</div>
+
+								<select ng-model="post.media_2_type" class="form-control post-upload-control-supplementary">
+									<option value="image">Image</option>
+									<option value="image-link">Image (Upload from a link)</option>
+									<option value="video">Video</option>
+									<option value="document">Document</option>
+								</select>
+
+								<input ng-if="post.media_2_type == 'image'" type="file" accept="image/*" class="form-control post-upload-control-supplementary" ng-file-select ng-file-change="onFileSelect($files, $event, 'media_2')">
+
+								<input ng-if="post.media_2_type == 'image-link'" type="text" ng-model="post.media_2_image_from_link" placeholder="Image url..." class="form-control post-upload-control-supplementary" ng-change="getImageFromLink(post, post.media_2_image_from_link, 'media_2')" />
+
+								<input ng-if="post.media_2_type == 'video'" type="text" ng-model="post.media_2" placeholder="Link video..." class="form-control post-upload-control-supplementary" ng-change="validateVideo(post, 'media_2')" />
+
+								<input ng-if="post.media_2_type == 'document'" type="text" ng-model="post.media_2" placeholder="Link document..." class="form-control post-upload-control-supplementary" ng-change="validateDocument(post, 'media_2')" />
+
+							</div>
+
+						</div>
+
+						<div class="post-supplementary-media" ng-if="(post.media_3 != null && post.media_3_type != null) || post.media_3_editing">
+							<div ng-if="post.media_3_editing != true">
+								<strong class="red cap-letters">
+									<a ng-if="post.media_3_type == 'image'" ng-href="{{ENV.baseUrl}}uploads/{{post.media_3}}" target="_blank">{{post.media_3_type}}</a>
+									<a ng-if="post.media_3_type != 'image'" href="{{post.media_3}}" target="_blank">{{post.media_3_type}}</a>
+								</strong> &nbsp; {{post.title}}
+
+								<div class="pull-right post-supplementary-action" ng-if="actions.postMode == 'add' || actions.postMode == 'edit'" ng-click="deleteSupplementaryMedia(post, 3)">
+									<i class="fa fa-trash-o"></i>
+								</div>
+
+								<div class="pull-right post-supplementary-action" ng-if="actions.postMode == 'add' || actions.postMode == 'edit'" ng-click="post.media_3_editing = true">
+									<i class="fa fa-pencil"></i>
+								</div>
+							</div>
+
+							<div ng-if="post.media_3_editing == true">
+								<div class="pull-right post-supplementary-action" ng-click="post.media_3_editing = false">
+									<i class="fa fa-check"></i>
+								</div>
+
+								<select ng-model="post.media_3_type" class="form-control post-upload-control-supplementary">
+									<option value="image">Image</option>
+									<option value="image-link">Image (Upload from a link)</option>
+									<option value="video">Video</option>
+									<option value="document">Document</option>
+								</select>
+
+								<input ng-if="post.media_3_type == 'image'" type="file" accept="image/*" class="form-control post-upload-control-supplementary" ng-file-select ng-file-change="onFileSelect($files, $event, 'media_3')">
+
+								<input ng-if="post.media_3_type == 'image-link'" type="text" ng-model="post.media_3_image_from_link" placeholder="Image url..." class="form-control post-upload-control-supplementary" ng-change="getImageFromLink(post, post.media_3_image_from_link, 'media_3')" />
+
+								<input ng-if="post.media_3_type == 'video'" type="text" ng-model="post.media_3" placeholder="Link video..." class="form-control post-upload-control-supplementary" ng-change="validateVideo(post, 'media_3')" />
+
+								<input ng-if="post.media_3_type == 'document'" type="text" ng-model="post.media_3" placeholder="Link document..." class="form-control post-upload-control-supplementary" ng-change="validateDocument(post, 'media_3')" />
+
+							</div>
+						</div>
+
+					</div>
+
+					<div class="post-column-1">
+						<h1 ng-show="post.title != '' && actions.postMode == 'view'">{{post.title}}</h1>
+
+						<h1 ng-show="actions.postMode == 'add' || actions.postMode == 'edit'" class="post-input">
+							<input type="text" placeholder="Enter Post Title" ng-model="post.title" ng-change="checkForDuplicates(post)" />
+						</h1>
+
+						<p ng-show="actions.postMode == 'view'" ng-bind-html="post.description"></p>
+
+						<div id="description_textarea" ng-show="actions.postMode == 'add' || actions.postMode == 'edit'" text-angular ng-model="post.description" ta-toolbar="[['bold','italics','underline','ul','ol','undo','redo','clear'],['justifyLeft','justifyCenter','justifyRight','indent','outdent','insertLink']]" class="post-input"></div>
+
+						<div class="post-summary" ng-show="post.summary.length || actions.postMode == 'add' || actions.postMode == 'edit'">
+							<h3>Short Summary<span ng-show="actions.postMode == 'add' || actions.postMode == 'edit'"> ({{post.summary_chars_remaining}} Characters Remaining)</span></h3>
+
+							<p ng-show="actions.postMode == 'view'">{{post.summary}}</p>
+
+							<div class="post-input">
+								<input type="text" placeholder="Enter a summary that will display on the map" maxlength="25" ng-model="post.summary" ng-show="actions.postMode == 'add' || actions.postMode == 'edit'" ng-change="calcSummaryCharsRemaining()" class="post-input" />
+							</div>
+						</div>
+
+						<div class="post-tags">
+							<h3>Tags</h3>
+
+							<div style="display: inline-block;" ng-repeat="(category, tags) in post.tags">
+								<div class="post-tag" style="display: inline-block;" ng-repeat="tag in tags">
+									{{tag.name}} <a title="remove tag" class="white" ng-if="(actions.postMode == 'edit' || actions.postMode == 'add') && category != 'Format'" href="javascript: void(0)" ng-click="deselectTag(category, tag)">| x</a>
+								</div>
+							</div>
+
+							<h3 ng-if="actions.postMode == 'edit' || actions.postMode == 'add'" class="red">
+								<a class="red" href="javascript: void(0)" ng-click="showTagsSelectionControl()">
+									+ Add/Edit Tags
+								</a>
+							</h3>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-sm-5 post-column-wrapper">
+					<div class="post-column-2 text-center" ng-if="current_user.id == post.user.id || current_user.is_admin">
+						<a class="btn btn-gray" href="javascript: void(0)" ng-click="deletePost(post)" ng-if="current_user.id == post.user.id || current_user.is_admin" ng-show="actions.postMode == 'edit'">
+							Delete Post <i class="fa fa-trash"></i>
+						</a>
+						<a class="btn btn-red" href="javascript: void(0)" ng-click="savePost(post)" ng-if="current_user.id == post.user.id || current_user.is_moderator" ng-show="actions.postMode == 'edit' || actions.postMode == 'add'">
+							Save Post <i class="fa fa-check"></i>
+						</a>
+						<a class="btn btn-red" href="javascript: void(0)" ng-click="actions.postMode = 'edit'" ng-if="current_user.id == post.user.id || current_user.is_moderator" ng-show="actions.postMode == 'view'">
+							Edit Post <i class="fa fa-pencil"></i>
+						</a>
+					</div>
+
+					<div class="post-column-2">
+						<div class="post-map" ng-click="viewLargeMap()" title="Click to expand map">
+
+							<ui-gmap-google-map center='post_map.center' zoom='post_map.zoom' options='post_map.options'>
+								<ui-gmap-marker coords="post.coords" idkey="post.id" icon="post.icon">
+						        </ui-gmap-marker>
+							</ui-gmap-google-map>
+
+						</div>
+
+						<div class="post-type">
+
+							<div class="row-fluid" ng-show="actions.postMode == 'view'">
+								<div class="pull-left post-type-icon">
+									<img ng-src="{{ENV.baseUrl}}assets/images/icons/{{post.post_type.icon_file}}.png" />
+								</div>
+								<div class="pull-left">
+									<div class="cap-emphasis red">{{post.post_type.name}}</div>
+									<span class="cap-emphasis black" ng-if="post.post_type.id == 3 || post.post_type.id == 5">When</span><span ng-if="post.post_type.id == 3 || post.post_type.id == 5">&nbsp;&nbsp;{{post.expiration_date | dateToISO | date:'MM/dd/yyyy @ h:mma'}}</span>
+								</div>
+								<div class="clearfix"> </div>
+							</div>
+
+							<div class="dropdown" ng-show="actions.postMode == 'add' || actions.postMode == 'edit'">
+								<button class="btn post-type-selection-btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
+									<div class="pull-left post-type-icon">
+										<img ng-src="{{ENV.baseUrl}}assets/images/icons/{{post.post_type.icon_file}}.png" />
+									</div>
+									<div class="pull-left">
+										<div class="cap-emphasis red">{{post.post_type.name}}</div>
+									</div>
+									<div class="pull-right">
+										<i class="fa fa-angle-down"></i>
+									</div>
+									<div class="clearfix"> </div>
+								</button>
+								<ul class="dropdown-menu post-type-selection-menu" role="menu">
+									<li ng-click="updatePostType(1)">
+										<div class="pull-left post-type-icon">
+											<img ng-src="{{ENV.baseUrl}}assets/images/icons/person_gray.png" />
+										</div>
+										<div class="pull-left">
+											<div class="cap-emphasis">Person</div>
+										</div>
+										<div class="clearfix"> </div>
+									</li>
+									<li ng-click="updatePostType(2)">
+										<div class="pull-left post-type-icon">
+											<img ng-src="{{ENV.baseUrl}}assets/images/icons/place_gray.png" />
+										</div>
+										<div class="pull-left">
+											<div class="cap-emphasis">Place</div>
+										</div>
+										<div class="clearfix"> </div>
+									</li>
+									<li ng-click="updatePostType(3)">
+										<div class="pull-left post-type-icon">
+											<img ng-src="{{ENV.baseUrl}}assets/images/icons/event_gray.png" />
+										</div>
+										<div class="pull-left">
+											<div class="cap-emphasis">Event</div>
+										</div>
+										<div class="clearfix"> </div>
+									</li>
+									<li ng-click="updatePostType(4)">
+										<div class="pull-left post-type-icon">
+											<img ng-src="{{ENV.baseUrl}}assets/images/icons/project_gray.png" />
+										</div>
+										<div class="pull-left">
+											<div class="cap-emphasis">Project</div>
+										</div>
+										<div class="clearfix"> </div>
+									</li>
+									<li ng-show="current_user.is_admin" ng-click="updatePostType(5)">
+										<div class="pull-left post-type-icon">
+											<img ng-src="{{ENV.baseUrl}}assets/images/icons/network_event_gray.png" />
+										</div>
+										<div class="pull-left">
+											<div class="cap-emphasis">Network Event</div>
+										</div>
+										<div class="clearfix"> </div>
+									</li>
+								</ul>
+							</div>
+							<div ng-if="post.post_type.id == 3 || post.post_type.id == 5" class="form-group" ng-show="actions.postMode == 'add' || actions.postMode == 'edit'">
+								<div class="col-xs-12">
+									<input type="text"
+									   placeholder="When..."
+					                   class="form-control"
+					                   ng-model="post.expiration_date" date-val="post.expiration_date"
+					                   aj-date-time-picker
+					                    />
+			                    </div>
+			                    <div class="clearfix"> </div>
+							</div>
+
+						</div>
+
+						<div class="post-location">
+
+							<h3>Location</h3>
+
+							<div ng-show="actions.postMode == 'view'">
+								<div class="cap-emphasis black">{{post.location}}</div>
+								{{post.address}}<br />
+								{{post.city}}, {{post.state}} {{post.zip}}
+							</div>
+
+							<div class="post-input" ng-show="actions.postMode == 'add' || actions.postMode == 'edit'">
+								<input class="bold" type="text" placeholder="Enter location name" ng-model="post.location" />
+								<input type="text" placeholder="Address" ng-model="post.address" ng-change="geocode(post)" />
+								<div class="row">
+									<div class="col-md-4">
+										<input type="text" placeholder="City," ng-model="post.city" ng-change="geocode(post)" />
+									</div>
+									<div class="col-md-4">
+										<input type="text" placeholder="State" ng-model="post.state" ng-change="geocode(post)" />
+									</div>
+									<div class="col-md-4">
+										<input type="text" placeholder="Zip" ng-model="post.zip" ng-change="geocode(post)" />
+									</div>
+									<div class="clearfix"> </div>
+								</div>
+							</div>
+						</div>
+
+						<div class="post-location" ng-show="actions.postMode != 'view' || post.contact_name != '' || post.contact_email != '' || post.contact_phone != '' || post.contact_website != ''">
+
+							<h3>Contact Details</h3>
+
+							<div ng-show="actions.postMode == 'view'">
+								<span ng-show="post.contact_name != '' && post.post_type.id != 1">Name: {{post.contact_name}}<br /></span>
+								<span ng-show="post.contact_email != ''">Email: <a title="{{post.contact_email}}" href="mailto:{{post.contact_email}}">{{post.contact_email | addEllipsis:40}}</a><br /></span>
+								<span ng-show="post.contact_phone != '' && post.post_type.id == 1">Phone: {{post.contact_phone}}<br /></span>
+								<span ng-show="post.contact_website != ''">Website: <a title="{{post.contact_website}}" ng-href="{{post.contact_website}}" target="_blank">{{post.contact_website | addEllipsis:40}}</a></span>
+							</div>
+
+							<div class="post-input" ng-show="actions.postMode == 'add' || actions.postMode == 'edit'">
+								<input type="text" placeholder="Name of contact" ng-model="post.contact_name" ng-show="post.post_type.id != 1" />
+								<input type="text" placeholder="Contact's email" ng-model="post.contact_email" />
+								<input type="text" placeholder="Contact's phone number" ng-model="post.contact_phone" ng-show="post.post_type.id == 1" />
+								<input type="text" placeholder="Official website" ng-model="post.contact_website" ng-show="post.post_type.id != 1" />
+								<input type="text" placeholder="Contact's website or LinkedIn profile" ng-model="post.contact_website" ng-show="post.post_type.id == 1" />
+							</div>
+						</div>
+
+						<div class="post-related" ng-if="post.relatedContent">
+							<h3>Related Content</h3>
+
+							<a ui-sref="post({postID:related.id})" class="black row-fluid" ng-repeat="related in post.relatedContent">
+								<div class="col-xs-4 info-window-image" style="max-width: 40px; max-height: 40px;" ng-style="{'background-image':'url({{ENV.baseUrl}}uploads/{{related.thumbnail}})'}"></div>
+								<div class="col-xs-8" title="{{related.title}}">{{related.title | addEllipsis:35}}<br />{{related.city}}, {{related.state}}</div>
+								<div class="col-xs-2"><img class="info-window-icon" ng-src="{{ENV.baseUrl}}assets/images/icons/{{related.post_type.icon_file}}.png" /></div>
+								<div class="clearfix"></div><br />
+							</a>
+						</div>
+
+						<div class="post-social">
+
+							<div class="row-fluid post-social-item">
+								<div class="pull-left">
+									<a ng-click="likePost(post)" class="circle-icon red thumbs-up-icon" ng-class="{ 'disabled' : actions.postMode != 'view' || post.liked }" ng-attr-title="{{!current_user && 'You must be signed in to like a post' || 'Like this post'}}"></a>
+								</div>
+								<div class="pull-left">
+									<div class="cap-emphasis black" ng-class="{ 'disabled' : actions.postMode != 'view' }">This was helpful!</div>
+									{{post.likes || 0}} people found this helpful<br />
+								</div>
+								<div class="clearfix"> </div>
+							</div>
+
+							<div ng-if="current_user != null && current_user != ''" class="row-fluid post-social-item">
+								<div class="pull-left">
+									<a ng-if="!post.favorited" class="circle-icon red plus-icon" ng-click="addToFavorites(post)" ng-class="{ 'disabled' : actions.postMode != 'view' }"></a>
+									<a ng-if="post.favorited" ng-click="removeFromFavorites(post)" class="circle-icon red check-icon" ng-class="{ 'disabled' : actions.postMode != 'view' }"></a>
+								</div>
+								<div class="pull-left padding-top">
+									<div ng-if="!post.favorited" class="cap-emphasis" ng-class="{ 'disabled' : actions.postMode != 'view' }">Add to Favorites</div>
+									<div ng-if="post.favorited" class="cap-emphasis" ng-class="{ 'disabled' : actions.postMode != 'view' }">Added to My Favorites</div>
+								</div>
+								<div class="clearfix"> </div>
+							</div>
+
+							<div class="row-fluid post-social-item">
+								<div class="pull-left">
+									<a class="circle-icon red facebook-icon" ng-href="https://www.facebook.com/dialog/feed?app_id=1049191555098283&redirect_uri=https://wcernetwork.org&link={{'https://wcernetwork.org#!/post/'+post.id | escape}}&name=NetworkEd: {{post.title}}&picture=https://wcernetwork.org/uploads/{{post.thumbnail}}&description={{post.description | htmlToPlainText | addEllipsis:50}}" target="_blank" ng-class="{ 'disabled' : actions.postMode != 'view' }"></a>
+
+									<a class="circle-icon red twitter-icon" href="http://twitter.com/share?text=Check out this post on NetworkEd!&url={{'https://wcernetwork.org#!/post/'+post.id | escape}}&hashtags=networked,uwmadison" target="_blank" ng-class="{ 'disabled' : actions.postMode != 'view' }"></a>
+
+									<a class="circle-icon red linkedin-icon" href="https://www.linkedin.com/shareArticle?mini=true&url=https://wcernetwork.org{{post.id}}&title={{'NetworkEd: '+post.title | escape}}&summary={{'NetworkEd: '+post.title | escape}}&source={{'NetworkEd' | escape}}" target="_blank" ng-class="{ 'disabled' : actions.postMode != 'view' }"></a>
+
+									<a class="circle-icon red googleplus-icon" href="https://plus.google.com/share?url=https://wcernetwork.org/post/{{post.id}}" target="_blank" ng-class="{ 'disabled' : actions.postMode != 'view' }"></a>
+									
+								</div>
+								<div class="pull-left padding-top">
+									<div class="cap-emphasis black" ng-class="{ 'disabled' : actions.postMode != 'view' }">Share</div>
+								</div>
+								<div class="clearfix"> </div>
+							</div>
+						</div>
+
+						<div class="post-author">
+
+							<div class="row-fluid">
+								<div class="pull-left">
+									<img ng-if="post.user.photo != ''" class="user-icon" ng-src="{{ENV.baseUrl}}user_photos/{{post.user.photo}}" />
+									<img ng-if="post.user.photo == ''" class="user-icon" ng-src="{{ENV.baseUrl}}assets/images/profile.png" style="width: auto; height: auto;" />
+									&nbsp;&nbsp;&nbsp;
+								</div>
+								<div class="pull-left">
+									<h3>Posted By</h3>
+									<a href="{{ENV.baseUrl}}profile/{{post.user.id}}" class="cap-emphasis black">{{post.user.first_name}} {{post.user.last_name}}</a><br />
+									{{post.user.city}}, {{post.user.state}}<br />
+									<!-- Posts: {{post.user.posts}} -->
+								</div>
+								<div class="clearfix"> </div>
+							</div>
+						</div>
+
+					</div>
+
+					<div class="post-column-2" ng-if="current_user && current_user.is_admin && actions.postMode != 'add'">
+						<h3>Assign New Post Owner</h3>
+						<i>Use this admin-only feature to transfer this post to another user</i>
+						<div class="input-group">
+							<select class="form-control" ng-model="selectedNewUser" ng-options="user.name for user in allUsers"></select> 
+							<a class="btn btn-sm input-group-btn" style="font-size: 13px;" href="javascript: void(0)" ng-click="assignNewOwner(post, selectedNewUser)">Assign User <i class="fa fa-angle-double-right"></i></a>
+						</div>
+
+						<br />
+
+						<h3>Add Post to a Collection</h3>
+						<i>Only admins have access to this feature</i>
+						<div class="input-group">
+							<select class="form-control" ng-model="selectedAddCollection" ng-options="collection.name for collection in allCollections"></select> 
+							<a class="btn btn-sm input-group-btn" style="font-size: 13px;" href="javascript: void(0)" ng-click="addToCollection(post, selectedAddCollection)">Add to Collection <i class="fa fa-angle-double-right"></i></a>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+		
+			<br />
+		</div>
+	</div>
+
+	<div id="footer">
+		<div ng-include="ENV.baseUrl + 'partials/footer.html'"></div>
+	</div>
+
+</div>

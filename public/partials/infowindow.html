@@ -1,0 +1,38 @@
+<div ng-controller="InfowindowController" style="overflow: hidden;">
+	<div class="info-window">
+		<a ui-sref="post({postID:parameter.id})" title="{{parameter.title}}" ng-class="{ 'active' : hover }" ng-mouseover="hover = true" ng-mouseleave="hover = false">
+			<div class="info-window-text info-window-title">
+				<strong class="red">{{parameter.title}}</strong>
+			</div>		
+		</a>
+		<div class="row info-window-row">
+			<div class="info-window-left-col">
+				<div class="info-window-image" style="background-image:url('{{parameter.thumbnail_sm}}');">
+					<a ui-sref="post({postID:parameter.id})" title="{{parameter.title}}" ng-class="{ 'active' : hover }" ng-mouseover="hover = true" ng-mouseleave="hover = false">
+						<div class="image-overlay">
+							<div class="image-overlay-view white" ng-show="hover">
+								View Post
+							</div>
+						</div>
+					</a>
+				</div>
+			</div>
+			<div class="info-window-right-col">
+				<div>
+					<span ng-if="parameter.foo.summary">{{parameter.foo.summary}}<br /></span>
+					<span title="{{parameter.foo.city}}, {{parameter.foo.state}}"><i>{{parameter.foo.city + ', ' + parameter.foo.state | addEllipsis:25}}</i><br /></span>
+				</div>
+				<div class="info-window-text">
+
+					<span ng-if="parameter.foo.contact_name" title="{{parameter.foo.contact_name}}">{{parameter.foo.contact_name}}<br /></span>
+
+					<a ng-if="parameter.foo.contact_email && !parameter.foo.contact_name" ng-href="mailto:{{parameter.foo.contact_email}}" title="{{parameter.foo.contact_email}}"><i class="fa fa-envelope"></i> {{parameter.foo.contact_email}}<br /></a>
+
+					<span ng-if="parameter.foo.contact_phone && !parameter.foo.contact_name && !parameter.foo.contact_email" title="{{parameter.foo.contact_phone}}"><i class="fa fa-phone"></i> {{parameter.foo.contact_phone}}<br /></span>
+
+					<a ng-if="parameter.foo.contact_website && !parameter.foo.contact_name && !parameter.foo.contact_email && !parameter.foo.contact_phone" ng-href="{{parameter.foo.contact_website}}" target="_blank" title="{{parameter.foo.contact_website}}"><i class="fa fa-external-link"></i> Website</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

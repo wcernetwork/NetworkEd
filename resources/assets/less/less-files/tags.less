@@ -1,0 +1,164 @@
+#tags_slidedown
+{
+	padding: 0 30px 40px;
+	text-align: left;
+
+	.container
+	{
+		padding-top: 10px;
+	}
+}
+
+.tag-row
+{
+	border-top: 1px solid rgba(255, 255, 255, 0.3);
+	padding: 10px 0;
+	margin-top: 8px;
+
+	&:last-child
+	{
+		border-bottom: 0;
+	}
+}
+
+.tag-category-name
+{
+	cursor: pointer;
+	color: #fff;
+	text-transform: uppercase;
+	padding: 5px 15px 5px 0;
+	display: inline;
+
+	&.active
+	{
+		color: @dark-red;
+		opacity: 1;
+	}
+}
+
+.tags-tag
+{
+	display: inline-block;
+	background-color: #fff;
+	color: @red;
+	border-radius: 10px;
+	padding: 1px 8px;
+	margin: 0px 6px 5px 0;
+	cursor: pointer;
+	font-size: 13px;
+
+	&:hover:not(.disabled):not(.selected)
+	{
+		opacity: 0.8;
+	}
+
+	&.selected
+	{
+		background-color: @dark-red;
+		color: #fff;
+	}
+
+	&.disabled:not(.selected)
+	{
+		opacity: 0.5;
+		background-color: #fff;
+		color: @red;
+		cursor: default;
+	}
+}
+
+.tags-type
+{
+	text-align: left;
+	cursor: pointer;
+	color: @red;
+	background-repeat: no-repeat;
+	background-position: left center;
+	padding: 3px 20px 5px 22px;
+
+	.rounded-corners
+	{
+		font-weight: bold;
+		float: left;
+		padding: 3px 12px 2px;
+		border-radius: 25px;
+		width: 100%;
+		background-color: #fff;
+
+		&:hover
+		{
+			opacity: 0.6;
+		}
+	}
+
+	&.active
+	{
+		color: #fff;
+
+		.rounded-corners
+		{
+			background-color: @dark-red;
+		}
+	}
+
+	&.inactive
+	{
+		opacity: 0.6;
+	}
+
+	.respond-to(@screen-sm, {
+		padding: 15px 60px 10px 50px;
+	});
+}
+
+.tag-people
+{
+	background-image: url('../images/icons/who_off.png');
+
+	&.active
+	{
+		background-image: url('../images/icons/who_on.png');
+	}
+}
+
+.tag-place
+{
+	background-image: url('../images/icons/place_off.png');
+
+	&.active
+	{
+		background-image: url('../images/icons/place_on.png');
+	}
+}
+
+.tag-event
+{
+	background-image: url('../images/icons/when_off.png');
+
+	&.active
+	{
+		background-image: url('../images/icons/when_on.png');
+	}
+}
+
+.tag-project
+{
+	background-image: url('../images/icons/how_off.png');
+
+	&.active
+	{
+		background-image: url('../images/icons/how_on.png');
+	}
+}
+
+.tag-people,
+.tag-place,
+.tag-event,
+.tag-project
+{
+	background-size: 16px;
+
+	.respond-to(@screen-sm, {
+		background-size: auto;
+	});
+}

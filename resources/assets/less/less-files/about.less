@@ -1,0 +1,181 @@
+/* about.less */
+
+.about-nav
+{
+	width: 100%;
+    text-align: center;
+    margin-bottom: 30px;
+    
+    li
+    {
+    	float: none;
+      	display: inline-block;
+      	font-weight: 700;
+      	margin-left: 0 !important;
+
+      	a
+      	{
+      		border-radius: 25px;
+      		color: @black;
+      		padding: 3px 8px 3px 10px;
+
+      		.respond-to(@screen-sm, {
+      			padding: 6px 25px;
+      		});
+      	}
+
+      	&.active
+      	{
+      		a,
+      		a:hover,
+      		a:focus
+      		{
+      			background-color: @red;
+      		}
+      	}
+    }
+}
+
+.carousel-control
+{
+	&.left,
+	&.right
+	{
+		color: @red;
+		background: transparent;
+	}
+}
+
+.carousel-inner
+{
+	width: 70%;
+	margin: 0 auto;
+}
+
+.carousel-indicators
+{
+	position: relative;
+	width: 100%;
+	margin-left: auto;
+	bottom: auto;
+	left: auto;
+
+	li
+	{
+		border: 1px solid #ccc;
+		background-color: #ddd;
+		margin: 5px;
+	}
+
+	.active
+	{
+		background-color: @red;
+		margin: 4px;
+	}
+}
+
+.slidebox-item
+{
+	.event-info-window-image
+	{
+		height: 160px;
+		width: 160px;
+
+		.image-overlay
+		{
+			width: 160px;
+			height: 160px;
+
+			&.archived
+			{
+				display: block;
+				background-color: rgba(0, 0, 0, 0.3);
+				opacity: 1;
+			}
+		}
+
+		.respond-to(@screen-xl, {
+			width: 210px;
+			height: 210px;
+
+			.image-overlay
+			{
+				width: 210px;
+				height: 210px;
+			}
+		});
+	}
+}
+
+.event-item
+{
+	width: 180px;
+	vertical-align: top;
+
+	.respond-to(@screen-xl, {
+		width: 230px;
+	});
+}
+
+.event-info-window-image
+{
+	position: relative;
+}
+
+.event-networked-label
+{
+	position: absolute;
+	background-color: @red;
+	color: white;
+	font-size: 11px;
+	padding: 5px 8px;
+	right: 0;
+	top: 0;
+}
+
+.event-date
+{
+	font-size: 13px;
+	font-weight: 600;
+	color: @dark-red;
+}
+
+.event-description, .event-description p
+{
+	max-width: 160px;
+}
+
+.event-title
+{
+	font-size: 20px;
+	font-weight: 600;
+	margin: 0;
+	line-height: 20px;
+	color: @black;
+}
+
+.event-info-window-text
+{
+	margin: 5px 10px 15px;
+	width: 90%;
+}
+
+.event-info-window-text.archived
+{
+	.event-date,
+	.event-title
+	{
+		color: @gray;
+	}
+}
+
+.tab-content
+{
+	table
+	{
+		img
+		{
+			max-width: 90%;
+		}
+	}
+}

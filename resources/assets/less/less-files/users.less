@@ -1,0 +1,332 @@
+/* users.less */
+
+.join-form
+{
+	.col-xs-6
+	{
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+}
+
+.profile-bg
+{
+	background-color: #ebebeb;
+	background-size: cover;
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	white-space: nowrap;
+	display: inline-block;
+	position: relative;
+
+	.img-helper
+	{
+		display: inline-block;
+		height: 100%;
+		vertical-align: middle;
+		margin-top: 100%;
+	}
+
+	img
+	{
+		vertical-align: middle;
+		max-width: 80px;
+		border-radius: 50%;
+		border: 2px solid @white;
+
+		&.img-big
+		{
+			max-width: 120px;
+			border: 8px solid @white;
+		}
+	}
+}
+
+.login-input-field
+{
+	background-color: @white;
+	border-radius: 25px;
+	margin-bottom: 10px;
+}
+
+.login-input-group
+{
+	text-align: left;
+	padding: 10px;
+	margin-bottom: 10px;
+	background-color: @white;
+}
+
+.login-input-input
+{
+	.form-control
+	{
+		outline: 0;
+		border: 0;
+		color: @red !important;
+	}
+
+	label
+	{
+		color: #333;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+	}
+}
+
+.login-input-label
+{
+	line-height: 43px;
+	text-transform: uppercase;
+	font-weight: 700;
+	font-size: 12px;
+	color: #333;
+	padding: 0 0px 0 15px;
+}
+
+.login-input-radio-label
+{
+	text-transform: uppercase;
+	color: #333;
+	padding: 0 5px;
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.submit-btn
+{
+	background-color: #333;
+
+	&:hover
+	{
+		background-color: @dark-red;
+	}
+}
+
+.profile-column-wrapper
+{
+	position: relative;
+}
+
+.profile-column-1
+{
+	padding: 0;
+
+	.respond-to(@screen-sm, {
+		position: fixed;
+		width: 210px;
+		top: 80px;
+		bottom: 50px;
+		overflow-y: auto;
+		overflow-x: hidden;
+	});
+	.respond-to(@screen-md, {
+		width: 283px;
+	});
+	.respond-to(@screen-lg, {
+		width: 350px;
+	});
+}
+
+.profile-column-2
+{
+	background-color: #fff;
+	padding: 20px;
+}
+
+.profile-about
+{
+	padding: 15px 20px;
+	background-color: #fff;
+
+	h3
+	{
+		padding: 5px 0;
+	}
+}
+
+.profile-social-link
+{
+	width: 100%;
+  	overflow: hidden;
+  	display: block;
+  	text-overflow: ellipsis;
+  	white-space: nowrap;
+}
+
+.profile-admin-header
+{
+	background-color: @dark-red;
+	padding: 10px;
+	text-align: center;
+}
+
+a.edit-profile
+{
+	padding: 15px 18px;
+	background-color: @red;
+	top: 0;
+	position: absolute;
+	right: 0;
+	color: white;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 1px;
+
+	&:hover
+	{
+		background-color: @dark-red;
+	}
+}
+
+.request-mod
+{
+	background-color: #7b7b7b;
+	color: #fff;
+	padding: 20px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-size: 13px;
+
+	.gray
+	{
+		color: #333;
+	}
+
+	&.allow-hover:hover
+	{
+		cursor: pointer;
+		background-color: @red;
+	}
+}
+
+.profile-dark-bg
+{
+	background-color: #414042;
+	padding: 15px 25px;
+
+	h2
+	{
+		padding-bottom: 5px;
+	}
+}
+
+.profile-view-subheader
+{
+	font-weight: 700;
+	font-size: 14px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+.profile-view
+{
+	padding: 0 25px 0 0;
+	cursor: pointer;
+	color: #000;
+
+	&.active
+	{
+		color: @red;
+	}
+
+	&:hover
+	{
+		color: @dark-red;
+	}
+}
+
+.profile-view-divider
+{
+	margin: 25px 0;
+	border-top: 1px solid #efefef;
+	width: 100%;
+}
+
+.profile-view-row
+{
+	color: @black;
+
+	.info-window-image
+	{
+		height: 80px;
+		width: 80px;
+	}
+
+	a
+	{
+		text-decoration: none;
+	}
+
+	&.active
+	{
+		color: @red;
+		cursor: pointer;
+		transition: 0.2s ease-in-out;
+
+		.image-overlay
+		{
+			position: relative;
+			top: 0;
+			width: 80px;
+			height: 80px;
+			background-color: @red;
+			background-color: @trans-red;
+			margin: 0 auto;
+			transition: 0.2s ease-in-out;
+		}
+	}
+
+	h2
+	{
+		font-size: 20px;
+	}
+
+	.respond-to(@screen-md, {
+		.info-window-image
+		{
+			height: 184px;
+			width: 184px;
+		}
+
+		&.active
+		{
+			.image-overlay
+			{
+				width: 184px;
+				height: 184px;
+			}
+		}
+
+		h2
+		{
+			font-size: 24px;
+		}
+	});
+}
+
+.approve-post
+{
+	color: #ccc;
+	font-size: 35px;
+
+	&:hover
+	{
+		cursor: pointer;
+		color: green;
+	}
+}
+
+.reject-post
+{
+	color: #ccc;
+	font-size: 35px;
+
+	&:hover
+	{
+		cursor: pointer;
+		color: @dark-red;
+	}
+}
