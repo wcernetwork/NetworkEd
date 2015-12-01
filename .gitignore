@@ -1,0 +1,26 @@
+/bootstrap/compiled.php
+/vendor
+composer.phar
+composer.lock
+.env.*.php
+.env.php
+app/config/local/database.php
+app/config/production/database.php
+app/config/production/mail.php
+.DS_Store
+Thumbs.db
+/node_modules
+app/config/local/database.php
+public/uploads
+public/user_backgrounds
+public/user_photos
+
+#but not these files...
+!/vendor/ahir*
+!/vendor/rtconner*
+app/config/staging/*
+app/config/local/recaptcha.php
+app/config/production/recaptcha.php
+app/config/recaptcha.php
+app/config/local/mail.php
+public/wat.php
